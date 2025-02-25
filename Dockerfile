@@ -1,5 +1,5 @@
 # 构建阶段
-FROM node:20-alpine
+FROM docker-0.unsee.tech/node:20-alpine
 WORKDIR /app
 
 # 安装依赖
@@ -19,4 +19,4 @@ RUN npm install -g serve --registry https://registry.npmmirror.com
 EXPOSE 3000
 
 # 启动服务
-CMD ["serve", "-s", "dist", "-l", "3000"] 
+CMD ["serve", "-s", "dist", "-l", "3000"]
