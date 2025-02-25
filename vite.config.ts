@@ -55,15 +55,20 @@ export default defineConfig({
     devSourcemap: true,
   },
   build: {
-    timeout: 300000,
-    minify: false,
     rollupOptions: {
       output: {
         chunkFileNames: `static/js/md-[name]-[hash].js`,
         entryFileNames: `static/js/md-[name]-[hash].js`,
         assetFileNames: `static/[ext]/md-[name]-[hash].[ext]`,
       },
-      external: [`crypto`, `http`, `https`],
+    },
+  },
+  esbuild: {
+    tsconfigRaw: {
+      compilerOptions: {
+        skipLibCheck: true,
+        noEmitOnError: false,
+      },
     },
   },
 })

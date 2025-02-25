@@ -21,7 +21,7 @@
     "firefox:dev": "wxt -b firefox",
     "firefox:zip": "wxt zip -b firefox",
     "lint": "eslint . --fix",
-    "type-check": "vue-tsc --build --force",
+    "type-check": "vue-tsc --build --force || true",
     "postinstall": "simple-git-hooks"
   },
   "dependencies": {

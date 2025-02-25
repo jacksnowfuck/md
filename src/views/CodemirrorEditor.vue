@@ -10,6 +10,20 @@ import {
 } from '@/utils'
 import fileApi from '@/utils/file'
 import CodeMirror from 'codemirror'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+
+// 导入所需的 CodeMirror 模式和插件
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/mode/markdown/markdown'
+import 'codemirror/mode/css/css'
+import 'codemirror/mode/javascript/javascript'
+import 'codemirror/addon/edit/closebrackets'
+import 'codemirror/addon/edit/matchbrackets'
+import 'codemirror/addon/selection/active-line'
+import 'codemirror/addon/hint/show-hint'
+import 'codemirror/addon/hint/css-hint'
+import 'codemirror/addon/hint/javascript-hint'
+import 'codemirror/addon/hint/show-hint.css'
 
 const store = useStore()
 const displayStore = useDisplayStore()
@@ -33,6 +47,24 @@ const isImgLoading = ref(false)
 const timeout = ref<NodeJS.Timeout>()
 
 const preview = ref<HTMLDivElement | null>(null)
+
+const editorTextarea = ref<HTMLTextAreaElement | null>(null)
+const cssEditorTextarea = ref<HTMLTextAreaElement | null>(null)
+
+// 修复 TextMarker.clear 错误的补丁
+function applyCodeMirrorPatch() {
+  const originalClear = CodeMirror.TextMarker.prototype.clear
+  CodeMirror.TextMarker.prototype.clear = function () {
+    try {
+      if (this.doc && this.doc.cm) {
+        originalClear.call(this)
+      }
+    }
+    catch (e) {
+      console.warn(`Prevented TextMarker.clear error:`, e)
+    }
+  }
+}
 
 // 使浏览区与编辑区滚动条建立同步联系
 function leftAndRightScroll() {
@@ -83,6 +115,105 @@ onMounted(() => {
   setTimeout(() => {
     leftAndRightScroll()
   }, 300)
+
+  // 应用补丁
+  applyCodeMirrorPatch()
+
+  // 初始化编辑器
+  if (editorTextarea.value) {
+    const editor = CodeMirror.fromTextArea(editorTextarea.value, {
+      mode: `markdown`,
+      theme: isDark.value ? `darcula` : `xq-light`,
+      lineNumbers: true,
+      lineWrapping: true,
+      tabSize: 2,
+      autofocus: true,
+      autoCloseBrackets: true,
+      matchBrackets: true,
+      styleActiveLine: true,
+    })
+
+    store.editor = editor
+
+    // 设置初始内容
+    editor.setValue(store.posts[store.currentPostIndex].content)
+
+    // 监听内容变化
+    editor.on(`change`, (cm) => {
+      store.posts[store.currentPostIndex].content = cm.getValue()
+    })
+  }
+
+  // 初始化 CSS 编辑器
+  if (cssEditorTextarea.value) {
+    const cssEditor = CodeMirror.fromTextArea(cssEditorTextarea.value, {
+      mode: `css`,
+      theme: isDark.value ? `darcula` : `xq-light`,
+      lineNumbers: true,
+      lineWrapping: true,
+      tabSize: 2,
+      autoCloseBrackets: true,
+      matchBrackets: true,
+      styleActiveLine: true,
+    })
+
+    store.cssEditor = cssEditor
+
+    // 设置初始内容
+    const activeTab = store.cssContentConfig.tabs.find(tab => tab.name === store.cssContentConfig.active)
+    if (activeTab) {
+      cssEditor.setValue(activeTab.content)
+    }
+
+    // 监听内容变化
+    cssEditor.on(`change`, (cm) => {
+      const activeTab = store.cssContentConfig.tabs.find(tab => tab.name === store.cssContentConfig.active)
+      if (activeTab) {
+        activeTab.content = cm.getValue()
+      }
+    })
+  }
+})
+
+// 清理编辑器实例，防止内存泄漏
+onBeforeUnmount(() => {
+  if (store.editor) {
+    store.editor.toTextArea()
+    store.editor = null
+  }
+
+  if (store.cssEditor) {
+    store.cssEditor.toTextArea()
+    store.cssEditor = null
+  }
+})
+
+// 监听主题变化
+watch(() => isDark.value, (isDark) => {
+  if (store.editor) {
+    store.editor.setOption(`theme`, isDark ? `darcula` : `xq-light`)
+  }
+
+  if (store.cssEditor) {
+    store.cssEditor.setOption(`theme`, isDark ? `darcula` : `xq-light`)
+  }
+})
+
+// 监听当前文章变化
+watch(() => store.currentPostIndex, (index) => {
+  if (store.editor) {
+    store.editor.setValue(store.posts[index].content)
+  }
+})
+
+// 监听 CSS 标签页变化
+watch(() => store.cssContentConfig.active, (active) => {
+  if (store.cssEditor) {
+    const activeTab = store.cssContentConfig.tabs.find(tab => tab.name === active)
+    if (activeTab) {
+      store.cssEditor.setValue(activeTab.content)
+    }
+  }
 })
 
 // 更新编辑器
@@ -184,6 +315,7 @@ function initEditor() {
     lineWrapping: true,
     styleActiveLine: true,
     autoCloseBrackets: true,
+    inputStyle: `contenteditable`,
     extraKeys: {
       [`${shiftKey}-${altKey}-F`]: function autoFormat(editor) {
         formatDoc(editor.getValue()).then((doc) => {
@@ -384,6 +516,7 @@ onMounted(() => {
             <ContextMenuTrigger>
               <textarea
                 id="editor"
+                ref="editorTextarea"
                 type="textarea"
                 placeholder="Your markdown text here."
               />

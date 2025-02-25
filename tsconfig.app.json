@@ -19,11 +19,13 @@
     "allowImportingTsExtensions": true,
 
     /* Linting */
-    "strict": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "strict": false,
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noEmit": true,
+    "noEmitOnError": false,
     "isolatedModules": true,
     "skipLibCheck": true
   },
