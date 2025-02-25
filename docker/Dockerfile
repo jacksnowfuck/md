@@ -1,5 +1,5 @@
 # 构建阶段
-FROM docker-0.unsee.tech/node:20-alpine
+FROM docker-0.unsee.tech/node:20-alpine as builder
 WORKDIR /app
 
 # 设置淘宝镜像源和环境变量
@@ -11,20 +11,20 @@ COPY package*.json ./
 RUN sed -i 's/"postinstall": ".*"/"postinstall": ""/' package.json && \
     sed -i 's/"prepare": ".*"/"prepare": ""/' package.json
 
-# 安装依赖（只安装生产依赖）
+# 安装依赖
 RUN npm install --legacy-peer-deps --production=false
 
 # 复制源代码
 COPY . .
 
-# 构建
-RUN NODE_ENV=production npm run build
+# 构建静态文件
+RUN npm run build
 
-# 安装 serve
-RUN npm install -g serve
+# 使用 nginx 托管静态文件
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# 暴露端口
-EXPOSE 3000
+EXPOSE 80
 
-# 启动服务
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["nginx", "-g", "daemon off;"] 
