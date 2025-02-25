@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    container_name: md-editor
+    ports:
+      - '3000:5173' # 使用 Node 服务的端口
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production # 设置环境变量
