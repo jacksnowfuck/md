@@ -149,14 +149,10 @@ md-cli 支持以下命令行参数：
 - `spaceId` dcloud 服务空间配置
 - `clientSecret` dcloud 服务空间配置
 
-### 方式 2. 使用 Docker 镜像
+### 方式 2. 使用 Docker
 
 如果你是 Docker 用户，也可以直接使用一条命令，启动完全属于你的、私有化运行的实例。
 
 ```sh
-docker run -d -p 8080:80 doocs/md:latest
+docker compose up -d
 ```
-
-容器运行起来之后，打开浏览器，访问 http://localhost:8080 即可。
-
-关于本项目 Docker 镜像的更多详细信息，可以关注 https://github.com/doocs/docker-md
