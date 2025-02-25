@@ -4,7 +4,7 @@ WORKDIR /app
 
 # 安装依赖
 COPY package*.json ./
-RUN npm install
+RUN npm install --registry https://registry.npmmirror.com
 
 # 复制源代码
 COPY . .
@@ -13,7 +13,7 @@ COPY . .
 RUN npm run build
 
 # 安装生产环境依赖
-RUN npm install -g serve
+RUN npm install -g serve --registry https://registry.npmmirror.com
 
 # 暴露端口
 EXPOSE 3000
