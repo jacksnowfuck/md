@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance } from 'vue'
+import ReplaceDialog from '@/components/CodemirrorEditor/ReplaceDialog.vue'
 import { altKey, altSign, ctrlKey, shiftKey, shiftSign } from '@/config'
 import { useDisplayStore, useStore } from '@/stores'
 import {
@@ -443,6 +444,8 @@ onMounted(() => {
       <UploadImgDialog @upload-image="uploadImage" />
 
       <InsertFormDialog />
+
+      <ReplaceDialog />
 
       <RunLoading />
 

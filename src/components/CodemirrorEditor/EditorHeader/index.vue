@@ -6,9 +6,9 @@ import {
   ctrlSign,
   shiftSign,
 } from '@/config'
-import { useStore } from '@/stores'
+import { useDisplayStore, useStore } from '@/stores'
 import { addPrefix, processClipboardContent } from '@/utils'
-import { ChevronDownIcon, Moon, PanelLeftClose, PanelLeftOpen, Settings, Sun } from 'lucide-vue-next'
+import { ChevronDownIcon, Moon, PanelLeftClose, PanelLeftOpen, Search, Settings, Sun } from 'lucide-vue-next'
 
 const emit = defineEmits([`addFormat`, `formatContent`, `startCopy`, `endCopy`])
 
@@ -46,6 +46,10 @@ const formatItems = [
 ] as const
 
 const store = useStore()
+const displayStore = useDisplayStore()
+
+// 添加调试代码
+console.log(`displayStore:`, displayStore)
 
 const { isDark, isCiteStatus, isCountStatus, output, primaryColor, isOpenPostSlider } = storeToRefs(store)
 
@@ -99,6 +103,11 @@ function copy() {
     })
   }, 350)
 }
+
+// 定义 toggleReplace 方法
+function toggleReplace() {
+  displayStore.isShowReplaceDialog = !displayStore.isShowReplaceDialog
+}
 </script>
 
 <template>
@@ -137,6 +146,16 @@ function copy() {
         <EditDropdown />
         <StyleDropdown />
         <HelpDropdown />
+
+        <MenubarMenu>
+          <MenubarTrigger>替换</MenubarTrigger>
+          <MenubarContent align="start">
+            <MenubarItem @click="toggleReplace">
+              <Search class="mr-2 h-4 w-4" />
+              查找替换
+            </MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
       </Menubar>
     </div>
 

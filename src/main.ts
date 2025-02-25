@@ -21,7 +21,12 @@ import 'codemirror/addon/hint/show-hint'
 import 'codemirror/addon/hint/css-hint'
 
 const app = createApp(App)
+const pinia = createPinia()
 
-app.use(createPinia())
+// 添加调试
+pinia.use(({ store }) => {
+  console.log(`Store initialized:`, store.$id, store)
+})
 
+app.use(pinia)
 app.mount(`#app`)
