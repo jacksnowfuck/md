@@ -5,20 +5,19 @@ WORKDIR /app
 # 设置淘宝镜像源
 RUN npm config set registry https://registry.npmmirror.com
 
-# 安装依赖
+# 复制 package.json 并修改
 COPY package*.json ./
+RUN sed -i 's/"postinstall": ".*"/"postinstall": ""/' package.json && \
+    sed -i 's/"prepare": ".*"/"prepare": ""/' package.json
+
+# 安装依赖
 RUN npm install --legacy-peer-deps
 
 # 复制源代码
 COPY . .
 
-# 删除 simple-git-hooks 相关命令
-RUN if [ -f "package.json" ]; then \
-    sed -i 's/"prepare": ".*"/"prepare": ""/' package.json; \
-    fi
-
-# 构建
-RUN npm run build
+# 构建 (添加 --debug 参数和更长的超时时间)
+RUN npm run build --debug || (echo "Build failed with error $?" && exit 1)
 
 # 安装 serve
 RUN npm install -g serve
