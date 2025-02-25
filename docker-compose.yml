@@ -7,6 +7,3 @@ services:
     ports:
       - '3000:3000' # 使用 Node 服务的端口
     restart: unless-stopped
-
-volumes:
-  node_modules: # 定义命名卷
