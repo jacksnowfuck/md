@@ -22,7 +22,7 @@
     "firefox:zip": "wxt zip -b firefox",
     "lint": "eslint . --fix",
     "type-check": "vue-tsc --build --force",
-    "postinstall": "simple-git-hooks && wxt prepare"
+    "postinstall": "simple-git-hooks"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.733.0",
@@ -89,8 +89,7 @@
     "vite": "^5.4.14",
     "vite-plugin-node-polyfills": "^0.23.0",
     "vite-plugin-vue-devtools": "^7.6.5",
-    "vue-tsc": "^2.2.0",
-    "wxt": "^0.19.25"
+    "vue-tsc": "^2.2.0"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
